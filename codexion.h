@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/03 11:07:26 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/08/29 22:25:56 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/08/30 02:02:50 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,36 @@
 
 typedef unsigned long	t_ms;
 
+typedef struct s_heap_node
+{
+	unsigned int		coder_id;
+	t_ms				priority;
+	pthread_cond_t		*cond;
+}						t_heap_node;
+
+typedef struct s_heap
+{
+	t_heap_node			*nodes;
+	int					size;
+	int					capacity;
+}						t_heap;
+
+typedef struct s_dongle
+{
+	t_heap				queue;
+	pthread_cond_t		cond;
+	pthread_mutex_t		mutex;
+	t_ms				released_time;
+	int					in_use;
+	int					id;
+}						t_dongle;
+
+typedef struct s_sim
+{
+	t_ms				start_time;
+	pthread_mutex_t		log_mutex;
+}						t_sim;
+
 typedef struct s_config
 {
 	unsigned int		number_of_coders;
@@ -34,6 +64,11 @@ typedef struct s_config
 	char				*scheduler;
 }						t_config;
 
-t_config	*cfg_fill(int argc, char **argv);
+t_heap					*heap_init(int capacity);
+t_heap_node				heap_pop(t_heap *heap);
+t_config				*cfg_fill(int argc, char **argv);
+t_ms					get_time_ms(void);
+void					heap_push(t_heap_node node, t_heap *heap);
+void					precise_sleep(t_ms duration);
 
 #endif
