@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/03 11:07:26 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/08/30 02:02:50 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/02 17:12:40 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ typedef struct s_heap
 
 typedef struct s_dongle
 {
-	t_heap				queue;
+	t_heap				heap;
 	pthread_cond_t		cond;
 	pthread_mutex_t		mutex;
 	t_ms				released_time;
@@ -46,10 +46,27 @@ typedef struct s_dongle
 	int					id;
 }						t_dongle;
 
+typedef struct s_coder
+{
+	unsigned int		id;
+	pthread_t			thread;
+	t_dongle			*left;
+	t_dongle			*right;
+	unsigned int		compile_count;
+	t_ms				last_compile_time;
+	t_sim				*sim;
+}						t_coder;
+
 typedef struct s_sim
 {
+	t_config			*cfg;
+	t_coder				*coders;
+	t_dongle			*dongles;
 	t_ms				start_time;
 	pthread_mutex_t		log_mutex;
+	int					stop;
+	pthread_mutex_t		stop_mutex;
+	pthread_t			monitor;
 }						t_sim;
 
 typedef struct s_config
