@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/30 14:21:04 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/03 01:49:17 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/03 02:15:26 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,7 @@ void	dongle_take(t_dongle *dongle, t_heap_node request, t_ms cooldown,
 		t_sim *sim)
 {
 	pthread_cond_t	cond;
-    struct timespec	ts;
+	struct timespec	ts;
 
 	pthread_mutex_lock(&dongle->mutex);
 	pthread_cond_init(&cond, NULL);
@@ -27,7 +27,10 @@ void	dongle_take(t_dongle *dongle, t_heap_node request, t_ms cooldown,
 				- dongle->released_time < cooldown)
 			|| dongle->heap->nodes[0].coder_id != request.coder_id))
 	{
-        ts = ms_to_timespec(1);
+		clock_gettime(CLOCK_REALTIME, &ts);
+		ts.tv_nsec += (cooldown * 1000000);
+		ts.tv_sec += ts.tv_nsec / 1000000000;
+		ts.tv_nsec %= 1000000000;
 		pthread_cond_timedwait(&cond, &dongle->mutex, &ts);
 	}
 	heap_pop(dongle->heap);

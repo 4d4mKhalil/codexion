@@ -2,7 +2,7 @@ NAME = codexion
 
 CFLAGS = -Wall -Wextra -Werror -pthread
 
-SRC = coder.c dongle.c init.c log.c main.c min_heap.c monitor.c parse.c time_utils.c utils.c
+SRC = cdx/coder.c cdx/dongle.c cdx/init.c cdx/log.c cdx/main.c cdx/min_heap.c cdx/monitor.c cdx/parse.c cdx/time_utils.c cdx/utils.c
 
 OBJ = $(SRC:.c=.o)
 
