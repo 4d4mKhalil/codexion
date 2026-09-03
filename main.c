@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 23:53:09 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/03 00:11:10 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/03 16:03:38 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,5 +35,6 @@ int	main(int argc, char **argv)
 		i++;
 	}
 	pthread_join(sim->monitor, NULL);
+	cleanup(sim);
 	return (0);
 }

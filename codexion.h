@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/03 11:07:26 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/03 01:46:02 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/03 16:02:27 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ typedef struct s_coder
 	t_dongle			*right;
 	unsigned int		compile_count;
 	t_ms				last_compile_time;
+	pthread_mutex_t		time_mutex;
 	t_sim				*sim;
 }						t_coder;
 
@@ -81,17 +82,6 @@ typedef struct s_sim
 	pthread_mutex_t		stop_mutex;
 	pthread_t			monitor;
 }						t_sim;
-
-struct timespec	ms_to_timespec(t_ms ms)
-{
-	struct timespec	ts;
-
-	clock_gettime(CLOCK_REALTIME, &ts);
-	ts.tv_nsec += (ms * 1000000);
-	ts.tv_sec += ts.tv_nsec / 1000000000;
-	ts.tv_nsec %= 1000000000;
-	return (ts);
-}
 
 t_heap					*heap_init(int capacity);
 t_heap_node				heap_pop(t_heap *heap);
@@ -110,5 +100,6 @@ t_sim					*sim_init(t_config *cfg);
 void					dongles_init(t_sim *sim);
 void					coders_init(t_sim *sim);
 void					threads_start(t_sim *sim);
+void					cleanup(t_sim *sim);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 22:52:02 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/03 01:38:46 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/03 16:03:13 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ void	coders_init(t_sim *sim)
 		sim->coders[i].last_compile_time = sim->start_time;
 		sim->coders[i].sim = sim;
 		assign_dongles(sim, i);
+		pthread_mutex_init(&sim->coders[i].time_mutex, NULL);
 		i++;
 	}
 }

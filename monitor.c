@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 21:56:38 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/02 22:42:12 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/03 15:58:44 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 void	*monitor_routine(void *arg)
 {
 	t_sim			*sim;
+	t_ms			last;
 	unsigned int	i;
 
 	sim = (t_sim *)arg;
@@ -25,8 +26,10 @@ void	*monitor_routine(void *arg)
 		i = 0;
 		while (i < sim->cfg->number_of_coders)
 		{
-			if (get_time_ms()
-				- sim->coders[i].last_compile_time > sim->cfg->time_to_burnout)
+			pthread_mutex_lock(&sim->coders[i].time_mutex);
+			last = sim->coders[i].last_compile_time;
+			pthread_mutex_unlock(&sim->coders[i].time_mutex);
+			if (get_time_ms() - last > sim->cfg->time_to_burnout)
 			{
 				log_state(sim, sim->coders[i].id, "burned out");
 				pthread_mutex_lock(&sim->stop_mutex);

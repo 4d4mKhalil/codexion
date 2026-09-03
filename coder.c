@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 17:18:46 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/03 01:32:51 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/03 16:01:56 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,9 @@ static void	compile_phase(t_coder *coder, t_sim *sim)
 	pthread_mutex_unlock(&sim->stop_mutex);
 	if (!take_dongles(coder, sim))
 		return ;
+	pthread_mutex_lock(&coder->time_mutex);
 	coder->last_compile_time = get_time_ms();
+	pthread_mutex_unlock(&coder->time_mutex);
 	log_state(sim, coder->id, "is compiling");
 	precise_sleep(sim->cfg->time_to_compile);
 	if (check_completion(coder, sim))
