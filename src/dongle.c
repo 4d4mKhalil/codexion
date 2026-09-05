@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/30 14:21:04 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/05 18:53:24 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/05 20:29:54 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,13 @@ static int	dongle_is_busy(t_dongle *dongle, t_heap_node request, t_ms cooldown,
 	int	s;
 
 	pthread_mutex_lock(&dongle->mutex);
-	s = !sim_is_stopped(sim) && (dongle->in_use == 1
-			|| (dongle->released_time > 0 && get_time_ms()
-				- dongle->released_time < cooldown)
-			|| dongle->heap->nodes[0].coder_id != request.coder_id);
+	s = dongle->in_use == 1;
+	if (!s && dongle->released_time > 0)
+		s = get_time_ms() - dongle->released_time < cooldown;
+	if (!s)
+		s = dongle->heap->nodes[0].coder_id != request.coder_id;
+	if (sim_is_stopped(sim))
+		s = 0;
 	pthread_mutex_unlock(&dongle->mutex);
 	return (s);
 }
