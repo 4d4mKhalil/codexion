@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 17:18:46 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/05 17:12:44 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/05 18:42:08 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,34 +17,11 @@ static t_heap_node	demand_request(t_coder *coder, t_sim *sim)
 	t_heap_node	request;
 
 	request.coder_id = coder->id;
-	request.cond = NULL;
 	if (strcmp(sim->cfg->scheduler, "fifo") == 0)
 		request.priority = get_time_ms();
 	else
 		request.priority = coder->last_compile_time + sim->cfg->time_to_burnout;
 	return (request);
-}
-
-static int	check_completion(t_coder *coder, t_sim *sim)
-{
-	unsigned int	i;
-	unsigned int	done;
-
-	pthread_mutex_lock(&sim->stop_mutex);
-	coder->compile_count++;
-	i = 0;
-	done = 0;
-	while (i < sim->cfg->number_of_coders)
-	{
-		if (sim->coders[i].compile_count
-			>= sim->cfg->number_of_compiles_required)
-			done++;
-		i++;
-	}
-	if (done == sim->cfg->number_of_coders)
-		sim->stop = 1;
-	pthread_mutex_unlock(&sim->stop_mutex);
-	return (sim->stop);
 }
 
 static int	take_dongles(t_coder *coder, t_sim *sim)
@@ -97,6 +74,16 @@ static void	compile_phase(t_coder *coder, t_sim *sim)
 	dongle_release(coder->right);
 }
 
+static void	debug_refactor(t_coder *coder, t_sim *sim)
+{
+	log_state(sim, coder->id, "is debugging");
+	precise_sleep(sim->cfg->time_to_debug);
+	if (sim_is_stopped(sim))
+		return ;
+	log_state(sim, coder->id, "is refactoring");
+	precise_sleep(sim->cfg->time_to_refactor);
+}
+
 void	*coder_routine(void *arg)
 {
 	t_coder	*coder;
@@ -111,19 +98,14 @@ void	*coder_routine(void *arg)
 		compile_phase(coder, sim);
 		if (sim_is_stopped(sim))
 			return (NULL);
-        if (coder->compile_count >= sim->cfg->number_of_compiles_required)
-        {
-            pthread_mutex_lock(&coder->time_mutex);
-            coder->last_compile_time = get_time_ms();
-            pthread_mutex_unlock(&coder->time_mutex);
-            usleep(10000);
-            continue ;
-        }
-		log_state(sim, coder->id, "is debugging");
-		precise_sleep(sim->cfg->time_to_debug);
-		if (sim_is_stopped(sim))
-			return (NULL);
-		log_state(sim, coder->id, "is refactoring");
-		precise_sleep(sim->cfg->time_to_refactor);
+		if (coder->compile_count >= sim->cfg->number_of_compiles_required)
+		{
+			pthread_mutex_lock(&coder->time_mutex);
+			coder->last_compile_time = get_time_ms();
+			pthread_mutex_unlock(&coder->time_mutex);
+			usleep(10000);
+			continue ;
+		}
+		debug_refactor(coder, sim);
 	}
 }

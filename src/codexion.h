@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/03 11:07:26 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/05 17:12:26 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/05 18:51:32 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,6 @@ typedef struct s_heap_node
 {
 	unsigned int		coder_id;
 	t_ms				priority;
-	pthread_cond_t		*cond;
 }						t_heap_node;
 
 typedef struct s_heap
@@ -52,7 +51,6 @@ typedef struct s_dongle
 {
 	t_heap				*heap;
 	pthread_mutex_t		mutex;
-    pthread_cond_t		cond;
 	t_ms				released_time;
 	int					in_use;
 	int					id;
@@ -69,7 +67,6 @@ typedef struct s_coder
 	unsigned int		compile_count;
 	t_ms				last_compile_time;
 	pthread_mutex_t		time_mutex;
-    pthread_cond_t      cond;
 	t_sim				*sim;
 }						t_coder;
 
@@ -103,5 +100,6 @@ void					dongles_init(t_sim *sim);
 void					coders_init(t_sim *sim);
 void					threads_start(t_sim *sim);
 void					cleanup(t_sim *sim);
+int						check_completion(t_coder *coder, t_sim *sim);
 
 #endif

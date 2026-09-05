@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 22:52:02 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/05 17:11:38 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/05 18:42:29 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,7 +40,6 @@ void	dongles_init(t_sim *sim)
 		if (!sim->dongles[i].heap)
 			return ;
 		pthread_mutex_init(&sim->dongles[i].mutex, NULL);
-        pthread_cond_init(&sim->dongles[i].cond, NULL);
 		sim->dongles[i].in_use = 0;
 		sim->dongles[i].released_time = 0;
 		sim->dongles[i].id = i;
@@ -81,7 +80,6 @@ void	coders_init(t_sim *sim)
 		sim->coders[i].sim = sim;
 		assign_dongles(sim, i);
 		pthread_mutex_init(&sim->coders[i].time_mutex, NULL);
-        pthread_cond_init(&sim->coders[i].cond, NULL);
 		i++;
 	}
 }
@@ -93,8 +91,8 @@ void	threads_start(t_sim *sim)
 	i = 0;
 	while (i < sim->cfg->number_of_coders)
 	{
-		pthread_create(&sim->coders[i].thread, NULL,
-			coder_routine, &sim->coders[i]);
+		pthread_create(&sim->coders[i].thread, NULL, coder_routine,
+			&sim->coders[i]);
 		i++;
 	}
 	pthread_create(&sim->monitor, NULL, monitor_routine, sim);

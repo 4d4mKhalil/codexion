@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 22:50:16 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/05 16:56:57 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/05 18:42:36 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ void	cleanup(t_sim *sim)
 		free(sim->dongles[i].heap);
 		pthread_mutex_destroy(&sim->dongles[i].mutex);
 		pthread_mutex_destroy(&sim->coders[i].time_mutex);
-        pthread_cond_destroy(&sim->coders[i].cond);
 		i++;
 	}
 	free(sim->dongles);
@@ -42,4 +41,26 @@ void	cleanup(t_sim *sim)
 	pthread_mutex_destroy(&sim->stop_mutex);
 	free(sim->cfg);
 	free(sim);
+}
+
+int	check_completion(t_coder *coder, t_sim *sim)
+{
+	unsigned int	i;
+	unsigned int	done;
+
+	pthread_mutex_lock(&sim->stop_mutex);
+	coder->compile_count++;
+	i = 0;
+	done = 0;
+	while (i < sim->cfg->number_of_coders)
+	{
+		if (sim->coders[i].compile_count
+			>= sim->cfg->number_of_compiles_required)
+			done++;
+		i++;
+	}
+	if (done == sim->cfg->number_of_coders)
+		sim->stop = 1;
+	pthread_mutex_unlock(&sim->stop_mutex);
+	return (sim->stop);
 }
