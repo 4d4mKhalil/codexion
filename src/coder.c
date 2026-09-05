@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 17:18:46 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/03 16:01:56 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/05 17:12:44 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,11 +111,14 @@ void	*coder_routine(void *arg)
 		compile_phase(coder, sim);
 		if (sim_is_stopped(sim))
 			return (NULL);
-		if (coder->compile_count >= sim->cfg->number_of_compiles_required)
-		{
-			usleep(10000);
-			continue ;
-		}
+        if (coder->compile_count >= sim->cfg->number_of_compiles_required)
+        {
+            pthread_mutex_lock(&coder->time_mutex);
+            coder->last_compile_time = get_time_ms();
+            pthread_mutex_unlock(&coder->time_mutex);
+            usleep(10000);
+            continue ;
+        }
 		log_state(sim, coder->id, "is debugging");
 		precise_sleep(sim->cfg->time_to_debug);
 		if (sim_is_stopped(sim))

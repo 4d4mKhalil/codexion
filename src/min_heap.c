@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/08/30 00:50:42 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/03 00:07:10 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/05 16:23:10 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,10 @@ void	heap_push(t_heap_node node, t_heap *heap)
 	node_i = heap->size - 1;
 	parent_i = (node_i - 1) / 2;
 	while (node_i > 0
-		&& heap->nodes[node_i].priority < heap->nodes[parent_i].priority)
+		&& (heap->nodes[node_i].priority < heap->nodes[parent_i].priority
+			|| (heap->nodes[node_i].priority == heap->nodes[parent_i].priority
+				&& heap->nodes[node_i].coder_id
+				< heap->nodes[parent_i].coder_id)))
 	{
 		tmp = heap->nodes[node_i];
 		heap->nodes[node_i] = heap->nodes[parent_i];

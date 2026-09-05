@@ -1,0 +1,55 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   dongle.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026/08/30 14:21:04 by adkhalil          #+#    #+#             */
+/*   Updated: 2026/09/05 17:30:40 by adkhalil         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
+#include "codexion.h"
+
+static int func(t_dongle *dongle, t_heap_node request,
+            t_ms cooldown, t_sim *sim)
+{
+    int s;
+    pthread_mutex_lock(& dongle->mutex);
+    s = !sim_is_stopped(sim) && (dongle->in_use == 1
+            || (dongle->released_time > 0 && get_time_ms()
+                - dongle->released_time < cooldown)
+            || dongle->heap->nodes[0].coder_id != request.coder_id);
+    pthread_mutex_unlock(&dongle->mutex);
+
+    return s;
+}
+void    dongle_take(t_dongle *dongle, t_heap_node request,
+            t_ms cooldown, t_sim *sim)
+{
+
+    pthread_mutex_lock(&dongle->mutex);
+    request.cond = &dongle->cond;
+    heap_push(request, dongle->heap);
+    pthread_mutex_unlock(&dongle->mutex);
+    while (func(dongle, request, cooldown, sim))
+    {
+        usleep(500);
+    }
+    pthread_mutex_lock(&dongle->mutex);
+
+    heap_pop(dongle->heap);
+    pthread_mutex_unlock(&dongle->mutex);
+
+    if (!sim_is_stopped(sim))
+        dongle->in_use = 1;
+}
+
+void	dongle_release(t_dongle *dongle)
+{
+	pthread_mutex_lock(&dongle->mutex);
+	dongle->in_use = 0;
+	dongle->released_time = get_time_ms();
+	pthread_mutex_unlock(&dongle->mutex);
+}

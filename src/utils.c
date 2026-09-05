@@ -6,7 +6,7 @@
 /*   By: adkhalil <adkhalil@student.1337.ma>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026/09/02 22:50:16 by adkhalil          #+#    #+#             */
-/*   Updated: 2026/09/03 16:04:18 by adkhalil         ###   ########.fr       */
+/*   Updated: 2026/09/05 16:56:57 by adkhalil         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ void	cleanup(t_sim *sim)
 		free(sim->dongles[i].heap);
 		pthread_mutex_destroy(&sim->dongles[i].mutex);
 		pthread_mutex_destroy(&sim->coders[i].time_mutex);
+        pthread_cond_destroy(&sim->coders[i].cond);
 		i++;
 	}
 	free(sim->dongles);
